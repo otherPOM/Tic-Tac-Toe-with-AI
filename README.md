@@ -17,3 +17,10 @@ The possible states are:
 
 If the user provides invalid coordinates, the program should repeat the request until numbers that represent an empty cell on the table are supplied. You should ensure that the program only outputs the table twice — before the move and after the user makes a legal move.
 
+## Stage 2
+In this stage, you should implement the following:
+1. Display an empty table when the program starts.
+2. The user plays first as X, and the program should ask the user to enter cell coordinates.
+3. Next, the computer makes its move as O, and the players then move in turn until someone wins or the game results in a draw.
+4. Print the final outcome at the very end of the game.
+

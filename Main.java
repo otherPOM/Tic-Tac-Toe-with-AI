@@ -6,21 +6,21 @@ public class Main {
     private static final Scanner scan = new Scanner(System.in);
 
     public static void main(String[] args) {
-        System.out.println("Enter the cells:");
-        var cells = scan.nextLine();
-        while (!cells.matches("[XO_]{9}")) {
-            System.out.println("Invalid cells given");
-            cells = scan.nextLine();
-        }
+//        System.out.println("Enter the cells:");
+//        var cells = scan.nextLine();
+//        while (!cells.matches("[XO_]{9}")) {
+//            System.out.println("Invalid cells given");
+//            cells = scan.nextLine();
+//        }
+        var cells = "_________";
 
         var grid = new Grid(cells);
         grid.print();
 
         var xMove = cells.chars().filter(c -> c == 'X').count() ==
                 cells.chars().filter(c -> c == 'O').count();
-//        var xMove = true;
         while (true) {
-            System.out.print("Enter the coordinates: ");
+            System.out.println("Enter the coordinates:");
             try {
                 var coordsInput = scan.nextLine().split("\\s+");
                 var x = Integer.parseInt(coordsInput[0]);
@@ -38,10 +38,21 @@ public class Main {
                 xMove = !xMove;
                 grid.print();
                 var state = grid.analyze();
-//                if (state != GameState.GAME_NOT_FINISHED) {
+                if (state != GameState.GAME_NOT_FINISHED) {
                     System.out.println(state.getMessage());
                     break;
-//                }
+                }
+
+                c = xMove ? 'X' : 'O';
+                System.out.println("Making move level \"easy\"");
+                grid.aiMoveEasy(c);
+                xMove = !xMove;
+                grid.print();
+                state = grid.analyze();
+                if (state != GameState.GAME_NOT_FINISHED) {
+                    System.out.println(state.getMessage());
+                    break;
+                }
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                 System.out.println("You should enter numbers!");
             }
