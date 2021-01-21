@@ -24,3 +24,13 @@ In this stage, you should implement the following:
 3. Next, the computer makes its move as O, and the players then move in turn until someone wins or the game results in a draw.
 4. Print the final outcome at the very end of the game.
 
+## Stage 3
+Your tasks for this stage are:
+1. Write a menu loop, which can interpret two commands: start and exit.
+2. Implement the command start. It should take two parameters: who will play X and who will play O. Two options are possible for now: user to play as a human, and easy to play as an AI.
+3. The exit command should simply end the program.
+
+In later steps, you will add the medium and hard levels.
+
+Don't forget to handle incorrect input! The message Bad parameters! should be displayed if what the user enters is invalid.
+

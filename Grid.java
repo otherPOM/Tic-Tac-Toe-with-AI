@@ -1,7 +1,5 @@
 package tictactoe;
 
-import java.util.Random;
-
 public class Grid {
     private final String cells;
     private final char[][] grid;
@@ -15,17 +13,6 @@ public class Grid {
                 {cells.charAt(6), cells.charAt(7), cells.charAt(8)}};
         xWon = false;
         oWon = false;
-    }
-
-    void aiMoveEasy(char c) {
-        var rand = new Random();
-        var x = rand.nextInt(3) + 1;
-        var y = rand.nextInt(3) + 1;
-        while (isOccupied(x, y)) {
-            x = rand.nextInt(3) + 1;
-            y = rand.nextInt(3) + 1;
-        }
-        move(x, y, c);
     }
 
     public void move(int x, int y, char c) {

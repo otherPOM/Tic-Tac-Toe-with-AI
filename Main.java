@@ -1,24 +1,62 @@
 package tictactoe;
 
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
     private static final Scanner scan = new Scanner(System.in);
+    private static Grid grid;
 
     public static void main(String[] args) {
-//        System.out.println("Enter the cells:");
-//        var cells = scan.nextLine();
-//        while (!cells.matches("[XO_]{9}")) {
-//            System.out.println("Invalid cells given");
-//            cells = scan.nextLine();
-//        }
-        var cells = "_________";
+        while (true) {
+            System.out.print("Input command: ");
+            String command = scan.nextLine();
 
-        var grid = new Grid(cells);
-        grid.print();
+            while (!command.matches("(?i)start (user|easy|medium|hard) (user|easy|medium|hard)")) {
+                if (command.equalsIgnoreCase("exit")) {
+                    return;
+                }
+                System.out.println("Bad parameters!");
+                command = scan.nextLine();
+            }
 
-        var xMove = cells.chars().filter(c -> c == 'X').count() ==
-                cells.chars().filter(c -> c == 'O').count();
+            var commandArgs = command.split("\\s+");
+            var player1 = commandArgs[1];
+            var player2 = commandArgs[2];
+            var cells = "_________";
+            grid = new Grid(cells);
+            grid.print();
+            boolean xMove = true;
+            while (true) {
+                char c = xMove ? 'X' : 'O';
+                move(c, xMove ? player1 : player2);
+                grid.print();
+                var state = grid.analyze();
+                if (state != GameState.GAME_NOT_FINISHED) {
+                    System.out.println(state.getMessage());
+                    break;
+                }
+                xMove = !xMove;
+            }
+        }
+    }
+
+    private static void move(char c, String player) {
+        switch (player) {
+            case "user":
+                playerMove(c);
+                break;
+            case "easy":
+                easyMove(c);
+                break;
+            case "medium":
+                break;
+            case "hard":
+                break;
+        }
+    }
+
+    private static void playerMove(char c) {
         while (true) {
             System.out.println("Enter the coordinates:");
             try {
@@ -33,29 +71,24 @@ public class Main {
                     System.out.println("This cell is occupied! Choose another one!");
                     continue;
                 }
-                char c = xMove ? 'X' : 'O';
-                grid.move(x, y, c);
-                xMove = !xMove;
-                grid.print();
-                var state = grid.analyze();
-                if (state != GameState.GAME_NOT_FINISHED) {
-                    System.out.println(state.getMessage());
-                    break;
-                }
 
-                c = xMove ? 'X' : 'O';
-                System.out.println("Making move level \"easy\"");
-                grid.aiMoveEasy(c);
-                xMove = !xMove;
-                grid.print();
-                state = grid.analyze();
-                if (state != GameState.GAME_NOT_FINISHED) {
-                    System.out.println(state.getMessage());
-                    break;
-                }
+                grid.move(x, y, c);
+                break;
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                 System.out.println("You should enter numbers!");
             }
         }
+    }
+
+    private static void easyMove(char c) {
+        System.out.println("Making move level \"easy\"");
+        var rand = new Random();
+        var x = rand.nextInt(3) + 1;
+        var y = rand.nextInt(3) + 1;
+        while (grid.isOccupied(x, y)) {
+            x = rand.nextInt(3) + 1;
+            y = rand.nextInt(3) + 1;
+        }
+        grid.move(x, y, c);
     }
 }
