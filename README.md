@@ -34,3 +34,10 @@ In later steps, you will add the medium and hard levels.
 
 Don't forget to handle incorrect input! The message Bad parameters! should be displayed if what the user enters is invalid.
 
+## Stage 4
+When the AI is playing at medium difficulty level, it makes moves using the following logic:
+1. If it already has two in a row and can win with one further move, it does so.
+2. If its opponent can win with one move, it plays the move necessary to block this.
+3. Otherwise, it makes a random move.
+
+You should add a medium parameter so that you can play against this level. It should also be possible to make AIs using easy and medium levels play against each other!

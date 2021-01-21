@@ -1,13 +1,11 @@
 package tictactoe;
 
-public class Grid {
-    private final String cells;
+public class Field {
     private final char[][] grid;
     private boolean xWon;
     private boolean oWon;
 
-    public Grid(String cells) {
-        this.cells = cells;
+    public Field(String cells) {
         grid = new char[][]{{cells.charAt(0), cells.charAt(1), cells.charAt(2)},
                 {cells.charAt(3), cells.charAt(4), cells.charAt(5)},
                 {cells.charAt(6), cells.charAt(7), cells.charAt(8)}};
@@ -47,11 +45,12 @@ public class Grid {
         if (oWon) {
             return GameState.O_WINS;
         }
-
-        return cells.contains("_") ? GameState.GAME_NOT_FINISHED : GameState.DRAW;
+        return (String.valueOf(grid[0]) + String.valueOf(grid[1]) + String.valueOf(grid[2]))
+                .contains("_") ? GameState.GAME_NOT_FINISHED : GameState.DRAW;
     }
 
     private boolean oneSideTooMany() {
+        var cells = String.valueOf(grid[0]) + String.valueOf(grid[1]) + String.valueOf(grid[2]);
         return Math.abs(cells.chars().filter(c -> c == 'X').count() -
                 cells.chars().filter(c -> c == 'O').count()) > 1;
     }
@@ -81,5 +80,9 @@ public class Grid {
                 }
             }
         }
+    }
+
+    public char[][] getGrid() {
+        return grid;
     }
 }
