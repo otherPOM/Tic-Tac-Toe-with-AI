@@ -1,31 +1,67 @@
 package tictactoe;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Field {
-    private final char[][] grid;
+    private final char[] grid;
     private boolean xWon;
     private boolean oWon;
+    private char player;
 
-    public Field(String cells) {
-        grid = new char[][]{{cells.charAt(0), cells.charAt(1), cells.charAt(2)},
-                {cells.charAt(3), cells.charAt(4), cells.charAt(5)},
-                {cells.charAt(6), cells.charAt(7), cells.charAt(8)}};
+    public Field(char[] grid) {
+        this.grid = grid;
+        xWon = false;
+        oWon = false;
+        player = 'X';
+    }
+
+    public void switchPlayer() {
+        player = player == 'X' ? 'O' : 'X';
+    }
+
+    public char getPlayer() {
+        return player;
+    }
+
+    void resetSpace(int ind) {
+        grid[ind] = '_';
+    }
+
+    void resetStates() {
         xWon = false;
         oWon = false;
     }
 
-    public void move(int x, int y, char c) {
-        grid[x - 1][y - 1] = c;
+    public void move(int x, int y) {
+        var ind = x * 3 + y;
+        move(ind);
+    }
+
+    public void move(int ind) {
+        grid[ind] = player;
     }
 
     public boolean isOccupied(int x, int y) {
-        return grid[x - 1][y - 1] != '_';
+        var ind = x * 3 + y;
+        return grid[ind] != '_';
+    }
+
+    public List<Integer> emptySpots() {
+        var res = new ArrayList<Integer>();
+        for (int i = 0; i < grid.length; i++) {
+            if (grid[i] == '_') {
+                res.add(i);
+            }
+        }
+        return res;
     }
 
     public void print() {
         System.out.println("---------");
-        for (char[] chars : grid) {
-            System.out.println("| " + chars[0] + " " +
-                    chars[1] + " " + chars[2] + " |");
+        for (int i = 0; i < 9; i += 3) {
+            System.out.println("| " + grid[i] + " " +
+                    grid[i + 1] + " " + grid[i + 2] + " |");
         }
         System.out.println("---------");
     }
@@ -45,44 +81,46 @@ public class Field {
         if (oWon) {
             return GameState.O_WINS;
         }
-        return (String.valueOf(grid[0]) + String.valueOf(grid[1]) + String.valueOf(grid[2]))
-                .contains("_") ? GameState.GAME_NOT_FINISHED : GameState.DRAW;
+        return String.valueOf(grid).contains("_") ? GameState.GAME_NOT_FINISHED : GameState.DRAW;
     }
 
     private boolean oneSideTooMany() {
-        var cells = String.valueOf(grid[0]) + String.valueOf(grid[1]) + String.valueOf(grid[2]);
+        var cells = String.valueOf(grid);
         return Math.abs(cells.chars().filter(c -> c == 'X').count() -
                 cells.chars().filter(c -> c == 'O').count()) > 1;
     }
 
     private void findWinner() {
-        for (int i = 0; i < 3; i++) {
-            if (grid[i][0] == grid[i][1] && grid[i][1] == grid[i][2]) {
-                if (grid[i][0] == 'O') {
+        for (int i = 0; i < 9; i += 3) {
+            if (grid[i] == grid[i + 1] && grid[i + 1] == grid[i + 2]) {
+                if (grid[i] == 'O') {
                     oWon = true;
-                } else if (grid[i][0] == 'X') {
-                    xWon = true;
-                }
-            }
-            if (grid[0][i] == grid[1][i] && grid[1][i] == grid[2][i]) {
-                if (grid[0][i] == 'O') {
-                    oWon = true;
-                } else if (grid[0][i] == 'X') {
-                    xWon = true;
-                }
-            }
-            if ((grid[0][0] == grid[1][1] && grid[1][1] == grid[2][2]) ||
-                    (grid[0][2] == grid[1][1] && grid[1][1] == grid[2][0])) {
-                if (grid[1][1] == 'O') {
-                    oWon = true;
-                } else if (grid[1][1] == 'X') {
+                } else if (grid[i] == 'X') {
                     xWon = true;
                 }
             }
         }
+        for (int i = 0; i < 3; i++) {
+            if (grid[i] == grid[i + 3] && grid[i + 3] == grid[i + 6]) {
+                if (grid[i] == 'O') {
+                    oWon = true;
+                } else if (grid[i] == 'X') {
+                    xWon = true;
+                }
+            }
+        }
+
+        if ((grid[0] == grid[4] && grid[4] == grid[8]) ||
+                (grid[2] == grid[4] && grid[4] == grid[6])) {
+            if (grid[4] == 'O') {
+                oWon = true;
+            } else if (grid[4] == 'X') {
+                xWon = true;
+            }
+        }
     }
 
-    public char[][] getGrid() {
+    public char[] getGrid() {
         return grid;
     }
 }

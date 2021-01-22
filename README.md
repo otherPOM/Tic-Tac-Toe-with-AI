@@ -41,3 +41,7 @@ When the AI is playing at medium difficulty level, it makes moves using the foll
 3. Otherwise, it makes a random move.
 
 You should add a medium parameter so that you can play against this level. It should also be possible to make AIs using easy and medium levels play against each other!
+
+## Stage 5
+In this last stage, you need to implement the hard difficulty level using the minimax algorithm .
+You should also add a hard parameter so that it's possible to play against this level.

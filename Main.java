@@ -1,5 +1,7 @@
 package tictactoe;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -23,13 +25,12 @@ public class Main {
             var commandArgs = command.split("\\s+");
             var player1 = commandArgs[1];
             var player2 = commandArgs[2];
-            var cells = "_________";
-            field = new Field(cells);
+            field = new Field(new char[]{'_', '_', '_', '_', '_', '_', '_', '_', '_'});
+
             field.print();
             boolean xMove = true;
             while (true) {
-                char c = xMove ? 'X' : 'O';
-                move(c, xMove ? player1 : player2);
+                move(xMove ? player1 : player2);
                 field.print();
                 var state = field.analyze();
                 if (state != GameState.GAME_NOT_FINISHED) {
@@ -37,30 +38,32 @@ public class Main {
                     break;
                 }
                 xMove = !xMove;
+                field.switchPlayer();
             }
         }
     }
 
-    private static void move(char c, String player) {
+    private static void move(String player) {
         switch (player) {
             case "user":
-                playerMove(c);
+                playerMove();
                 break;
             case "easy":
                 System.out.println("Making move level \"easy\"");
-                easyMove(c);
+                easyMove();
                 break;
             case "medium":
                 System.out.println("Making move level \"medium\"");
-                mediumMove(c);
+                mediumMove();
                 break;
             case "hard":
-                hardMove(c);
+                System.out.println("Making move level \"hard\"");
+                hardMove();
                 break;
         }
     }
 
-    private static void playerMove(char c) {
+    private static void playerMove() {
         while (true) {
             System.out.println("Enter the coordinates:");
             try {
@@ -71,12 +74,14 @@ public class Main {
                     System.out.println("Coordinates should be from 1 to 3!");
                     continue;
                 }
+                x -= 1;
+                y -= 1;
                 if (field.isOccupied(x, y)) {
                     System.out.println("This cell is occupied! Choose another one!");
                     continue;
                 }
 
-                field.move(x, y, c);
+                field.move(x, y);
                 break;
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                 System.out.println("You should enter numbers!");
@@ -84,80 +89,88 @@ public class Main {
         }
     }
 
-    private static void easyMove(char c) {
+    private static void easyMove() {
         var rand = new Random();
-        var x = rand.nextInt(3) + 1;
-        var y = rand.nextInt(3) + 1;
+        var x = rand.nextInt(3);
+        var y = rand.nextInt(3);
         while (field.isOccupied(x, y)) {
-            x = rand.nextInt(3) + 1;
-            y = rand.nextInt(3) + 1;
+            x = rand.nextInt(3);
+            y = rand.nextInt(3);
         }
-        field.move(x, y, c);
+        field.move(x, y);
     }
 
-    private static void mediumMove(char c) {
-        var grid = field.getGrid();
-        int x = 10;
-        int y = 10;
+    private static void mediumMove() {
+        var ind = findGameEndingMove(field.getPlayer());
 
-        for (int i = 0; i < grid.length; i++) {
-            var line = String.valueOf(grid[i]);
-            var column = "" + grid[0][i] + grid[1][i] + grid[2][i];
+        char b = field.getPlayer() == 'X' ? 'O' : 'X';
+        if (ind == -1) {
+            ind = findGameEndingMove(b);
+            if (ind == -1) {
+                easyMove();
+                return;
+            }
+        }
+
+        field.move(ind);
+    }
+
+    private static int findGameEndingMove(char c) {
+        var grid = field.getGrid();
+        int ind = -1;
+
+        for (int i = 0; i < grid.length; i += 3) {
+            var line = "" + grid[i] + grid[i + 1] + grid[i + 2];
             if (line.chars().filter(l -> l == c).count() == 2 && line.contains("_")) {
-                x = i + 1;
-                y = line.indexOf('_') + 1;
+                ind = i + line.indexOf('_');
                 break;
             }
+
+        }
+        for (int i = 0; i < 3; i++) {
+            var column = "" + grid[i] + grid[i + 3] + grid[i + 6];
             if (column.chars().filter(l -> l == c).count() == 2 && column.contains("_")) {
-                x = column.indexOf('_') + 1;
-                y = i + 1;
+                ind = i + 3 * column.indexOf('_');
                 break;
             }
         }
-        var dia1 = "" + grid[0][0] + grid[1][1] + grid[2][2];
-        var dia2 = "" + grid[2][0] + grid[1][1] + grid[0][2];
+
+        var dia1 = "" + grid[0] + grid[4] + grid[8];
+        var dia2 = "" + grid[2] + grid[4] + grid[6];
         if (dia1.chars().filter(l -> l == c).count() == 2 && dia1.contains("_")) {
-            x = dia1.indexOf('_') + 1;
-            y = dia1.indexOf('_') + 1;
+            ind = dia1.indexOf('_') * 4;
         }
         if (dia2.chars().filter(l -> l == c).count() == 2 && dia2.contains("_")) {
-            x = dia2.indexOf('_') == 0 ? 3 : dia2.indexOf('_') == 2 ? 1 : 2;
-            y = dia2.indexOf('_') + 1;
+            ind = dia2.indexOf('_') * 2 + 2;
         }
-
-        char b = c == 'X' ? 'O' : 'X';
-        if (x == 10) {
-            for (int i = 0; i < grid.length; i++) {
-                var line = String.valueOf(grid[i]);
-                var column = "" + grid[0][i] + grid[1][i] + grid[2][i];
-                if (line.chars().filter(l -> l == b).count() == 2 && line.contains("_")) {
-                    x = i + 1;
-                    y = line.indexOf('_') + 1;
-                    break;
-                }
-                if (column.chars().filter(l -> l == b).count() == 2 && column.contains("_")) {
-                    x = column.indexOf('_') + 1;
-                    y = i + 1;
-                    break;
-                }
-            }
-            if (dia1.chars().filter(l -> l == b).count() == 2 && dia1.contains("_")) {
-                x = dia1.indexOf('_') + 1;
-                y = dia1.indexOf('_') + 1;
-            }
-            if (dia2.chars().filter(l -> l == b).count() == 2 && dia2.contains("_")) {
-                x = dia2.indexOf('_') == 0 ? 3 : dia2.indexOf('_') == 2 ? 1 : 2;
-                y = dia2.indexOf('_') + 1;
-            }
-        }
-        if (x == 10) {
-            easyMove(c);
-        } else {
-            field.move(x, y, c);
-        }
+        return ind;
     }
 
-    private static void hardMove(char c) {
+    private static void hardMove() {
+        var bestMove = calculateBestMove(0, new HashMap<>());
+        field.move(bestMove);
+    }
 
+    private static int calculateBestMove(int depth, Map<Integer, Integer> potentialOutcomes) {
+        var state = field.analyze();
+        field.resetStates();
+        if (state == GameState.DRAW) {
+            return 0;
+        } else if (state == GameState.X_WINS || state == GameState.O_WINS) {
+            return -1;
+        } else {
+            for (int space : field.emptySpots()) {
+                field.move(space);
+                field.switchPlayer();
+                potentialOutcomes.put(space, (-1 * calculateBestMove(depth + 1, new HashMap<>())));
+                field.resetSpace(space);
+                field.switchPlayer();
+            }
+            if (depth == 0) {
+                return potentialOutcomes.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+            } else {
+                return potentialOutcomes.entrySet().stream().max(Map.Entry.comparingByValue()).get().getValue();
+            }
+        }
     }
 }
